@@ -5,22 +5,23 @@ const path = require('path');
 
 const app = express();
 
-// IMPORTANT: Increase payload limit for images
+// Increase payload limit for images
 app.use(cors());
 app.use(express.json({ limit: '50mb' }));
 app.use(express.urlencoded({ limit: '50mb', extended: true }));
-app.use(express.static('.'));
+
+// Serve static files from current directory
+app.use(express.static(__dirname));
 
 // File paths
 const SERVICES_FILE = path.join(__dirname, 'services.json');
 const USERS_FILE = path.join(__dirname, 'users.json');
 
-// Initialize empty services array
+// Initialize files
 if (!fs.existsSync(SERVICES_FILE)) {
     fs.writeFileSync(SERVICES_FILE, JSON.stringify([], null, 2));
 }
 
-// Create default admin user
 if (!fs.existsSync(USERS_FILE)) {
     fs.writeFileSync(USERS_FILE, JSON.stringify([
         {
@@ -56,7 +57,7 @@ function getUsers() {
     }
 }
 
-// GET all services
+// API Routes
 app.get('/api/services', (req, res) => {
     try {
         const services = getServices();
@@ -66,7 +67,6 @@ app.get('/api/services', (req, res) => {
     }
 });
 
-// POST - Add new service (with image support)
 app.post('/api/services', (req, res) => {
     try {
         console.log('📦 Received service data');
@@ -95,7 +95,6 @@ app.post('/api/services', (req, res) => {
     }
 });
 
-// DELETE service
 app.delete('/api/services/:id', (req, res) => {
     try {
         let services = getServices();
@@ -107,7 +106,6 @@ app.delete('/api/services/:id', (req, res) => {
     }
 });
 
-// Admin login
 app.post('/api/admin/login', (req, res) => {
     try {
         const { email, password } = req.body;
@@ -128,7 +126,6 @@ app.post('/api/admin/login', (req, res) => {
     }
 });
 
-// Get stats
 app.get('/api/admin/stats', (req, res) => {
     try {
         const services = getServices();
@@ -142,17 +139,14 @@ app.get('/api/admin/stats', (req, res) => {
     }
 });
 
-// Get orders (placeholder)
 app.get('/api/admin/orders', (req, res) => {
     res.json([]);
 });
 
-// Update order (placeholder)
 app.put('/api/admin/orders/:id', (req, res) => {
     res.json({ success: true });
 });
 
-// Get settings
 app.get('/api/admin/settings', (req, res) => {
     res.json({
         siteName: "Graphic House",
@@ -162,16 +156,19 @@ app.get('/api/admin/settings', (req, res) => {
     });
 });
 
-// Update settings
 app.put('/api/admin/settings', (req, res) => {
     res.json({ success: true });
 });
 
-// ========== FIX: Use the PORT from Render ==========
+// Serve admin.html at root
+app.get('/', (req, res) => {
+    res.sendFile(path.join(__dirname, 'admin.html'));
+});
+
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, '0.0.0.0', () => {
     console.log(`✅ SERVER RUNNING on port ${PORT}`);
-    console.log(`📋 ADMIN PANEL: https://graphichouse-api.onrender.com/admin.html`);
+    console.log(`📋 ADMIN PANEL: https://graphichousefinal.onrender.com`);
     console.log(`🔐 LOGIN: admin@graphichouse.com.np / admin123`);
     console.log(`📸 Image upload: Enabled (50MB limit)`);
 });
