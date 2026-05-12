@@ -6,12 +6,10 @@
     <title>Graphic House - Professional Admin Suite</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: 'Inter', sans-serif; background: #0f0f1a; overflow-x: hidden; }
+        body { font-family: 'Inter', sans-serif; background: #0f0f1a; }
         
-        /* Animated Background */
         .bg-animation {
             position: fixed;
             width: 100%;
@@ -19,29 +17,14 @@
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             z-index: -2;
         }
-        .bg-animation::before {
-            content: '';
-            position: absolute;
-            width: 200%;
-            height: 200%;
-            background: radial-gradient(circle, rgba(255,255,255,0.1) 1px, transparent 1px);
-            background-size: 50px 50px;
-            animation: float 30s linear infinite;
-        }
-        @keyframes float {
-            0% { transform: translate(0, 0); }
-            100% { transform: translate(50px, 50px); }
-        }
         
-        /* Login */
         .login-wrapper {
             min-height: 100vh;
             display: flex;
             align-items: center;
             justify-content: center;
-            position: relative;
-            z-index: 1;
         }
+        
         .login-card {
             background: rgba(255,255,255,0.95);
             backdrop-filter: blur(10px);
@@ -49,15 +32,10 @@
             padding: 50px;
             width: 480px;
             box-shadow: 0 25px 50px rgba(0,0,0,0.3);
-            animation: slideUp 0.6s ease;
-        }
-        @keyframes slideUp {
-            from { transform: translateY(50px); opacity: 0; }
-            to { transform: translateY(0); opacity: 1; }
         }
         
-        /* Dashboard */
         .dashboard { display: none; }
+        
         .sidebar {
             width: 280px;
             background: rgba(26, 26, 46, 0.95);
@@ -67,15 +45,15 @@
             top: 0;
             height: 100vh;
             color: white;
-            z-index: 100;
-            border-right: 1px solid rgba(255,255,255,0.1);
+            overflow-y: auto;
         }
+        
         .sidebar-header {
             padding: 30px 25px;
             text-align: center;
             border-bottom: 1px solid rgba(255,255,255,0.1);
         }
-        .sidebar-header h3 { margin-top: 15px; font-size: 20px; }
+        
         .nav-item {
             padding: 15px 25px;
             margin: 5px 15px;
@@ -87,43 +65,38 @@
             color: rgba(255,255,255,0.7);
             transition: all 0.3s;
         }
+        
         .nav-item:hover, .nav-item.active {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
             transform: translateX(5px);
         }
+        
         .main-content {
             margin-left: 280px;
             padding: 30px;
-            position: relative;
-            z-index: 1;
         }
         
-        /* Stats Cards */
         .stats-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
             gap: 25px;
             margin-bottom: 30px;
         }
+        
         .stat-card {
             background: rgba(255,255,255,0.95);
-            backdrop-filter: blur(10px);
             border-radius: 20px;
             padding: 25px;
             transition: all 0.3s;
-            cursor: pointer;
-            border: 1px solid rgba(255,255,255,0.2);
         }
-        .stat-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
-        }
-        .stat-icon { font-size: 40px; margin-bottom: 15px; }
-        .stat-value { font-size: 36px; font-weight: 800; color: #333; }
-        .stat-label { color: #666; font-size: 14px; margin-top: 5px; }
         
-        /* Buttons */
+        .stat-value {
+            font-size: 36px;
+            font-weight: 800;
+            color: #333;
+        }
+        
         .btn {
             padding: 12px 24px;
             border: none;
@@ -131,18 +104,17 @@
             cursor: pointer;
             font-weight: 600;
             transition: all 0.3s;
-            font-size: 14px;
         }
+        
         .btn-primary {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
         }
-        .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(102,126,234,0.4); }
+        
         .btn-danger { background: #ff4757; color: white; }
         .btn-success { background: #00b894; color: white; }
         .btn-warning { background: #fdcb6e; color: #333; }
         
-        /* Modal */
         .modal {
             display: none;
             position: fixed;
@@ -154,20 +126,20 @@
             z-index: 1000;
             justify-content: center;
             align-items: center;
-            backdrop-filter: blur(5px);
         }
+        
         .modal.active { display: flex; }
+        
         .modal-content {
             background: white;
             border-radius: 25px;
             padding: 35px;
             width: 90%;
-            max-width: 700px;
+            max-width: 600px;
             max-height: 85vh;
             overflow-y: auto;
         }
         
-        /* Forms */
         .form-group { margin-bottom: 20px; }
         .form-group label {
             display: block;
@@ -175,50 +147,30 @@
             font-weight: 600;
             color: #333;
         }
+        
         .form-group input, .form-group select, .form-group textarea {
             width: 100%;
             padding: 12px 15px;
             border: 2px solid #e0e0e0;
             border-radius: 12px;
             font-size: 14px;
-            transition: all 0.3s;
-        }
-        .form-group input:focus, .form-group select:focus, .form-group textarea:focus {
-            outline: none;
-            border-color: #667eea;
         }
         
-        /* Bulk Price Section */
-        .bulk-price-row {
-            background: #f8f9fa;
-            padding: 15px;
-            border-radius: 12px;
-            margin-bottom: 10px;
-            display: flex;
-            gap: 10px;
-            align-items: center;
-        }
-        .bulk-price-row input { flex: 1; margin: 0; }
-        
-        /* Image Upload */
         .image-upload-area {
             border: 2px dashed #ddd;
             border-radius: 15px;
             padding: 30px;
             text-align: center;
             cursor: pointer;
-            transition: all 0.3s;
         }
-        .image-upload-area:hover {
-            border-color: #667eea;
-            background: #f8f9fa;
-        }
+        
         .image-preview {
             display: flex;
             gap: 10px;
             flex-wrap: wrap;
             margin-top: 15px;
         }
+        
         .preview-img {
             width: 80px;
             height: 80px;
@@ -227,59 +179,49 @@
             border: 2px solid #667eea;
         }
         
-        /* Services Grid */
         .services-grid {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
             gap: 25px;
             margin-top: 20px;
         }
+        
         .service-card {
             background: white;
             border-radius: 20px;
             overflow: hidden;
             box-shadow: 0 5px 20px rgba(0,0,0,0.1);
-            transition: all 0.3s;
         }
-        .service-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 10px 30px rgba(0,0,0,0.15);
-        }
+        
         .service-img { width: 100%; height: 250px; object-fit: cover; }
         .service-info { padding: 20px; }
-        .service-price {
-            color: #667eea;
-            font-size: 28px;
-            font-weight: bold;
-        }
-        .bulk-pricing {
-            background: #f0f2f5;
-            padding: 10px;
-            border-radius: 10px;
-            margin: 15px 0;
-            font-size: 13px;
-        }
+        .service-price { color: #667eea; font-size: 28px; font-weight: bold; }
         
         .data-table {
             background: white;
             border-radius: 20px;
             overflow: hidden;
-            box-shadow: 0 5px 20px rgba(0,0,0,0.05);
         }
+        
         .data-table table { width: 100%; border-collapse: collapse; }
         .data-table th, .data-table td {
             padding: 15px 20px;
             text-align: left;
             border-bottom: 1px solid #eee;
         }
-        .data-table th { background: #f8f9fa; font-weight: 600; }
+        .data-table th { background: #f8f9fa; }
+        
+        .category-item {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 12px;
+            margin-bottom: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
         
         .hidden { display: none; }
-        
-        @media (max-width: 768px) {
-            .sidebar { transform: translateX(-100%); }
-            .main-content { margin-left: 0; }
-        }
     </style>
 </head>
 <body>
@@ -305,7 +247,6 @@
         <button class="btn btn-primary" style="width: 100%;" onclick="login()">
             <i class="fas fa-arrow-right"></i> Login to Dashboard
         </button>
-        <p style="text-align: center; margin-top: 20px; color: #888;">Demo: admin@graphichouse.com.np / admin123</p>
     </div>
 </div>
 
@@ -315,7 +256,6 @@
         <div class="sidebar-header">
             <i class="fas fa-crown" style="font-size: 45px;"></i>
             <h3>Graphic House</h3>
-            <p style="font-size: 12px; opacity: 0.8;">Premium Admin Suite</p>
         </div>
         <div class="nav-item active" onclick="loadSection('dashboard')">
             <i class="fas fa-chart-pie"></i> Dashboard
@@ -323,11 +263,8 @@
         <div class="nav-item" onclick="loadSection('services')">
             <i class="fas fa-box"></i> Services
         </div>
-        <div class="nav-item" onclick="loadSection('orders')">
-            <i class="fas fa-shopping-cart"></i> Orders
-        </div>
-        <div class="nav-item" onclick="loadSection('analytics')">
-            <i class="fas fa-chart-line"></i> Analytics
+        <div class="nav-item" onclick="loadSection('categories')">
+            <i class="fas fa-tags"></i> Categories
         </div>
         <div class="nav-item" onclick="loadSection('settings')">
             <i class="fas fa-cog"></i> Settings
@@ -345,58 +282,58 @@
 <!-- Add Service Modal -->
 <div id="serviceModal" class="modal">
     <div class="modal-content">
-        <h2 style="margin-bottom: 20px;"><i class="fas fa-plus-circle" style="color: #667eea;"></i> Add New Service</h2>
+        <h2><i class="fas fa-plus-circle"></i> Add New Service</h2>
         <form id="serviceForm">
             <div class="form-group">
                 <label>Service Name *</label>
-                <input type="text" id="serviceName" required placeholder="e.g., Premium T-Shirt Printing">
+                <input type="text" id="serviceName" required>
             </div>
             <div class="form-group">
                 <label>Category *</label>
-                <select id="category">
-                    <option value="printing">🖨️ Printing Services</option>
-                    <option value="t-shirt">👕 T-Shirt Printing</option>
-                    <option value="flags">🚩 Flags & Banners</option>
-                    <option value="wedding-cards">💒 Wedding Cards</option>
-                    <option value="keyrings">🔑 Keyrings</option>
-                    <option value="school-vest">🎒 School Vest</option>
-                    <option value="flex-photos">📸 Flex Photos</option>
-                    <option value="digital-boards">🖥️ Digital Boards</option>
-                    <option value="neon-boards">💡 Neon Boards</option>
-                </select>
+                <select id="category" required></select>
             </div>
             <div class="form-group">
                 <label>Description</label>
-                <textarea id="description" rows="3" placeholder="Describe the service details..."></textarea>
+                <textarea id="description" rows="3"></textarea>
             </div>
             <div class="form-group">
                 <label>Base Price (NPR) *</label>
-                <input type="number" id="basePrice" required placeholder="e.g., 1000">
+                <input type="number" id="basePrice" required>
             </div>
-            
-            <!-- Bulk Pricing Section -->
             <div class="form-group">
-                <label><i class="fas fa-chart-line"></i> Bulk Pricing (Quantity Discounts)</label>
-                <div id="bulkPricesList"></div>
-                <button type="button" class="btn btn-warning" onclick="addBulkPrice()" style="margin-top: 10px;">
-                    <i class="fas fa-plus"></i> Add Bulk Price Tier
-                </button>
-            </div>
-            
-            <div class="form-group">
-                <label>Upload Image (Click to select from computer)</label>
+                <label>Upload Image</label>
                 <div class="image-upload-area" onclick="document.getElementById('imageFile').click()">
                     <i class="fas fa-cloud-upload-alt" style="font-size: 40px; color: #667eea;"></i>
-                    <p style="margin-top: 10px;">Click or drag image here</p>
-                    <p style="font-size: 12px; color: #888;">JPG, PNG, GIF up to 5MB</p>
+                    <p>Click to select image from computer</p>
                 </div>
                 <input type="file" id="imageFile" accept="image/*" style="display: none;" onchange="previewImage(this)">
-                <div id="imagePreview"></div>
+                <div id="imagePreview" class="image-preview"></div>
             </div>
-            
-            <div style="display: flex; gap: 10px; margin-top: 25px;">
-                <button type="submit" class="btn btn-primary"><i class="fas fa-save"></i> Save Service</button>
+            <div style="display: flex; gap: 10px; margin-top: 20px;">
+                <button type="submit" class="btn btn-primary">Save Service</button>
                 <button type="button" class="btn" onclick="closeModal()">Cancel</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Add Category Modal -->
+<div id="categoryModal" class="modal">
+    <div class="modal-content">
+        <h2><i class="fas fa-tag"></i> Add New Category</h2>
+        <form id="categoryForm">
+            <div class="form-group">
+                <label>Category Name *</label>
+                <input type="text" id="categoryName" required placeholder="e.g., Custom Mugs">
+            </div>
+            <div class="form-group">
+                <label>Icon (Font Awesome)</label>
+                <input type="text" id="categoryIcon" placeholder="fa-mug-hot">
+                <small>Find icons at fontawesome.com</small>
+            </div>
+            <div style="display: flex; gap: 10px; margin-top: 20px;">
+                <button type="submit" class="btn btn-primary">Add Category</button>
+                <button type="button" class="btn" onclick="closeCategoryModal()">Cancel</button>
             </div>
         </form>
     </div>
@@ -404,11 +341,12 @@
 
 <script>
     let currentImageBase64 = null;
-    let bulkPrices = [];
+    let categories = [];
     
     if (localStorage.getItem('token')) {
         document.getElementById('loginScreen').style.display = 'none';
         document.getElementById('dashboard').style.display = 'block';
+        loadCategories();
         loadSection('dashboard');
     }
     
@@ -425,25 +363,25 @@
         if (res.ok) {
             const data = await res.json();
             localStorage.setItem('token', data.token);
+            localStorage.setItem('userEmail', email);
             document.getElementById('loginScreen').style.display = 'none';
             document.getElementById('dashboard').style.display = 'block';
+            await loadCategories();
             loadSection('dashboard');
         } else {
             alert('Login failed! Use admin@graphichouse.com.np / admin123');
         }
     }
     
-    function addBulkPrice() {
-        const container = document.getElementById('bulkPricesList');
-        const div = document.createElement('div');
-        div.className = 'bulk-price-row';
-        div.innerHTML = `
-            <input type="number" placeholder="Min Quantity" class="bulk-min" style="width: 30%">
-            <input type="number" placeholder="Max Quantity" class="bulk-max" style="width: 30%">
-            <input type="number" placeholder="Price per unit (NPR)" class="bulk-price" style="width: 30%">
-            <button type="button" onclick="this.parentElement.remove()" style="background: #ff4757; color: white; border: none; padding: 10px; border-radius: 8px; cursor: pointer;">✖</button>
-        `;
-        container.appendChild(div);
+    async function loadCategories() {
+        const res = await fetch('/api/categories');
+        categories = await res.json();
+        
+        // Update category dropdown in service form
+        const select = document.getElementById('category');
+        if (select) {
+            select.innerHTML = categories.map(c => `<option value="${c.slug}">${c.name}</option>`).join('');
+        }
     }
     
     function previewImage(input) {
@@ -466,26 +404,13 @@
     document.getElementById('serviceForm').addEventListener('submit', async (e) => {
         e.preventDefault();
         
-        // Collect bulk prices
-        const bulkPrices = [];
-        document.querySelectorAll('.bulk-price-row').forEach(row => {
-            const min = row.querySelector('.bulk-min')?.value;
-            const max = row.querySelector('.bulk-max')?.value;
-            const price = row.querySelector('.bulk-price')?.value;
-            if (min && max && price) {
-                bulkPrices.push({ min: parseInt(min), max: parseInt(max), price: parseInt(price) });
-            }
-        });
-        
         const service = {
             name: document.getElementById('serviceName').value,
             category: document.getElementById('category').value,
             description: document.getElementById('description').value,
             basePrice: parseFloat(document.getElementById('basePrice').value),
             images: currentImageBase64 ? [currentImageBase64] : [],
-            bulkPrices: bulkPrices,
-            priceOptions: [],
-            createdAt: new Date().toISOString()
+            bulkPrices: []
         };
         
         const res = await fetch('/api/services', {
@@ -500,152 +425,176 @@
             loadSection('services');
             document.getElementById('serviceForm').reset();
             document.getElementById('imagePreview').innerHTML = '';
-            document.getElementById('bulkPricesList').innerHTML = '';
             currentImageBase64 = null;
         } else {
             alert('❌ Failed to add service');
         }
     });
     
+    document.getElementById('categoryForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        
+        const category = {
+            name: document.getElementById('categoryName').value,
+            icon: document.getElementById('categoryIcon').value || 'fa-tag'
+        };
+        
+        const res = await fetch('/api/categories', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(category)
+        });
+        
+        if (res.ok) {
+            alert('✅ Category added successfully!');
+            closeCategoryModal();
+            await loadCategories();
+            loadSection('categories');
+        } else {
+            alert('❌ Failed to add category');
+        }
+    });
+    
     function openModal() {
         document.getElementById('serviceModal').classList.add('active');
+        loadCategories();
     }
     
     function closeModal() {
         document.getElementById('serviceModal').classList.remove('active');
     }
     
+    function openCategoryModal() {
+        document.getElementById('categoryModal').classList.add('active');
+    }
+    
+    function closeCategoryModal() {
+        document.getElementById('categoryModal').classList.remove('active');
+        document.getElementById('categoryForm').reset();
+    }
+    
     async function loadSection(section) {
         const contentDiv = document.getElementById('dashboardContent');
-        const services = await fetch('/api/services').then(r => r.json());
         
         if (section === 'dashboard') {
-            const totalRevenue = services.reduce((sum, s) => sum + (s.basePrice || 0), 0);
+            const stats = await fetch('/api/admin/stats').then(r => r.json());
             contentDiv.innerHTML = `
                 <div class="stats-grid">
                     <div class="stat-card">
-                        <div class="stat-icon"><i class="fas fa-box"></i></div>
-                        <div class="stat-value">${services.length}</div>
-                        <div class="stat-label">Total Services</div>
+                        <div class="stat-value">${stats.totalServices}</div>
+                        <div>Total Services</div>
                     </div>
                     <div class="stat-card">
-                        <div class="stat-icon"><i class="fas fa-chart-line"></i></div>
-                        <div class="stat-value">${services.filter(s => s.bulkPrices?.length).length}</div>
-                        <div class="stat-label">With Bulk Pricing</div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-icon"><i class="fas fa-rupee-sign"></i></div>
-                        <div class="stat-value">${totalRevenue.toLocaleString()}</div>
-                        <div class="stat-label">Total Portfolio Value</div>
+                        <div class="stat-value">${categories.length}</div>
+                        <div>Categories</div>
                     </div>
                 </div>
                 <div class="stat-card" style="margin-top: 20px;">
                     <h3>Quick Actions</h3>
-                    <button class="btn btn-primary" onclick="openModal()" style="margin-top: 15px;">
-                        <i class="fas fa-plus"></i> Add New Service
-                    </button>
-                    <button class="btn btn-success" onclick="loadSection('services')" style="margin-top: 15px; margin-left: 10px;">
-                        <i class="fas fa-eye"></i> View All Services
-                    </button>
+                    <button class="btn btn-primary" onclick="openModal()">➕ Add Service</button>
+                    <button class="btn btn-success" onclick="openCategoryModal()">🏷️ Add Category</button>
                 </div>
             `;
         }
         else if (section === 'services') {
+            const services = await fetch('/api/services').then(r => r.json());
             contentDiv.innerHTML = `
                 <div style="margin-bottom: 20px;">
-                    <button class="btn btn-primary" onclick="openModal()">
-                        <i class="fas fa-plus"></i> Add New Service
-                    </button>
+                    <button class="btn btn-primary" onclick="openModal()">➕ Add Service</button>
                 </div>
                 <div class="services-grid" id="servicesGrid"></div>
             `;
             
             const grid = document.getElementById('servicesGrid');
             if (services.length === 0) {
-                grid.innerHTML = '<div style="text-align: center; padding: 50px; background: white; border-radius: 20px;">No services yet. Click "Add New Service" to start.</div>';
+                grid.innerHTML = '<div style="text-align: center; padding: 50px; background: white; border-radius: 20px;">No services yet. Click "Add Service" to start.</div>';
             } else {
                 grid.innerHTML = services.map(service => `
                     <div class="service-card">
-                        <img src="${service.images[0] || 'https://via.placeholder.com/350x250?text=Graphic+House'}" class="service-img" onerror="this.src='https://via.placeholder.com/350x250?text=No+Image'">
+                        <img src="${service.images[0] || 'https://via.placeholder.com/350x250?text=No+Image'}" class="service-img">
                         <div class="service-info">
                             <h3>${service.name}</h3>
-                            <p style="color: #666; font-size: 14px;">${service.description || 'Premium quality service'}</p>
+                            <p>${service.description || ''}</p>
                             <div class="service-price">NPR ${service.basePrice}</div>
-                            ${service.bulkPrices && service.bulkPrices.length > 0 ? `
-                                <div class="bulk-pricing">
-                                    <strong><i class="fas fa-tags"></i> Bulk Pricing:</strong><br>
-                                    ${service.bulkPrices.map(b => `${b.min}-${b.max} pcs: NPR ${b.price} each`).join('<br>')}
-                                </div>
-                            ` : ''}
-                            <button class="btn btn-danger" onclick="deleteService('${service._id}')" style="width: 100%; margin-top: 10px;">
-                                <i class="fas fa-trash"></i> Delete
-                            </button>
+                            <button class="btn btn-danger" onclick="deleteService('${service._id}')">Delete</button>
                         </div>
                     </div>
                 `).join('');
             }
         }
-        else if (section === 'analytics') {
-            const totalViews = services.reduce((sum, s) => sum + (s.views || 0), 0);
+        else if (section === 'categories') {
             contentDiv.innerHTML = `
-                <div class="stats-grid">
-                    <div class="stat-card">
-                        <div class="stat-icon"><i class="fas fa-eye"></i></div>
-                        <div class="stat-value">${totalViews}</div>
-                        <div class="stat-label">Total Views</div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-icon"><i class="fas fa-fire"></i></div>
-                        <div class="stat-value">${services.filter(s => s.views > 10).length}</div>
-                        <div class="stat-label">Popular Services</div>
-                    </div>
+                <div style="margin-bottom: 20px;">
+                    <button class="btn btn-success" onclick="openCategoryModal()">➕ Add Category</button>
                 </div>
                 <div class="data-table">
-                    <h3 style="padding: 20px;">Top Services</h3>
                     <table>
-                        <thead><tr><th>Service</th><th>Category</th><th>Price</th><th>Views</th></tr></thead>
-                        <tbody>
-                            ${services.slice(0,5).map(s => `
-                                <tr><td>${s.name}</td><td>${s.category}</td><td>NPR ${s.basePrice}</td><td>${s.views || 0}</td></tr>
-                            `).join('')}
-                        </tbody>
+                        <thead><tr><th>Category Name</th><th>Icon</th><th>Slug</th><th>Actions</th></tr></thead>
+                        <tbody id="categoriesList"></tbody>
                     </table>
                 </div>
             `;
+            
+            const tbody = document.getElementById('categoriesList');
+            tbody.innerHTML = categories.map(cat => `
+                <tr>
+                    <td>${cat.name}</td>
+                    <td><i class="fas ${cat.icon}"></i></td>
+                    <td>${cat.slug}</td>
+                    <td><button class="btn btn-danger" onclick="deleteCategory('${cat.id}')">Delete</button></td>
+                </tr>
+            `).join('');
         }
         else if (section === 'settings') {
+            const userEmail = localStorage.getItem('userEmail') || 'admin@graphichouse.com.np';
             contentDiv.innerHTML = `
                 <div class="data-table" style="padding: 30px;">
-                    <h3>Business Settings</h3>
-                    <p>Update your business information below:</p>
-                    <div class="form-group">
-                        <label>WhatsApp Number (for customer inquiries)</label>
-                        <input type="text" id="whatsappNumber" placeholder="98XXXXXXXX">
-                    </div>
-                    <div class="form-group">
-                        <label>Business Email</label>
-                        <input type="email" id="businessEmail" placeholder="info@graphichouse.com.np">
-                    </div>
-                    <div class="form-group">
-                        <label>Address</label>
-                        <textarea id="businessAddress" rows="2" placeholder="Your business address"></textarea>
-                    </div>
-                    <button class="btn btn-primary" onclick="saveSettings()">Save Settings</button>
+                    <h3>Change Password</h3>
+                    <form id="passwordForm">
+                        <div class="form-group">
+                            <label>Current Password</label>
+                            <input type="password" id="currentPassword" required>
+                        </div>
+                        <div class="form-group">
+                            <label>New Password</label>
+                            <input type="password" id="newPassword" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Confirm New Password</label>
+                            <input type="password" id="confirmPassword" required>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Change Password</button>
+                    </form>
                 </div>
             `;
-        }
-        else if (section === 'orders') {
-            contentDiv.innerHTML = `
-                <div class="data-table">
-                    <h3 style="padding: 20px;">Customer Orders</h3>
-                    <table>
-                        <thead><tr><th>Order ID</th><th>Customer</th><th>Service</th><th>Quantity</th><th>Total</th><th>Status</th></tr></thead>
-                        <tbody>
-                            <tr><td colspan="6" style="text-align: center;">No orders yet</td></tr>
-                        </tbody>
-                    </table>
-                </div>
-            `;
+            
+            document.getElementById('passwordForm').addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const newPassword = document.getElementById('newPassword').value;
+                const confirmPassword = document.getElementById('confirmPassword').value;
+                
+                if (newPassword !== confirmPassword) {
+                    alert('New passwords do not match!');
+                    return;
+                }
+                
+                const res = await fetch('/api/admin/change-password', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        email: userEmail,
+                        currentPassword: document.getElementById('currentPassword').value,
+                        newPassword: newPassword
+                    })
+                });
+                
+                if (res.ok) {
+                    alert('✅ Password changed successfully! Please login again.');
+                    logout();
+                } else {
+                    alert('❌ Current password is incorrect');
+                }
+            });
         }
         
         document.querySelectorAll('.nav-item').forEach(item => item.classList.remove('active'));
@@ -653,18 +602,23 @@
     }
     
     async function deleteService(id) {
-        if (confirm('Delete this service permanently?')) {
+        if (confirm('Delete this service?')) {
             await fetch(`/api/services/${id}`, { method: 'DELETE' });
             loadSection('services');
         }
     }
     
-    function saveSettings() {
-        alert('✅ Settings saved! WhatsApp number updated for customer inquiries.');
+    async function deleteCategory(id) {
+        if (confirm('Delete this category? Services in this category will need reassignment.')) {
+            await fetch(`/api/categories/${id}`, { method: 'DELETE' });
+            await loadCategories();
+            loadSection('categories');
+        }
     }
     
     function logout() {
         localStorage.removeItem('token');
+        localStorage.removeItem('userEmail');
         location.reload();
     }
 </script>

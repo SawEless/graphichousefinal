@@ -9,13 +9,12 @@ const app = express();
 app.use(cors());
 app.use(express.json({ limit: '50mb' }));
 app.use(express.urlencoded({ limit: '50mb', extended: true }));
-
-// Serve static files from current directory
 app.use(express.static(__dirname));
 
 // File paths
 const SERVICES_FILE = path.join(__dirname, 'services.json');
 const USERS_FILE = path.join(__dirname, 'users.json');
+const CATEGORIES_FILE = path.join(__dirname, 'categories.json');
 
 // Initialize files
 if (!fs.existsSync(SERVICES_FILE)) {
@@ -29,8 +28,24 @@ if (!fs.existsSync(USERS_FILE)) {
             username: 'admin',
             email: 'admin@graphichouse.com.np',
             password: 'admin123',
-            role: 'admin'
+            role: 'admin',
+            createdAt: new Date().toISOString()
         }
+    ], null, 2));
+}
+
+// Initialize default categories
+if (!fs.existsSync(CATEGORIES_FILE)) {
+    fs.writeFileSync(CATEGORIES_FILE, JSON.stringify([
+        { id: 'cat1', name: '🖨️ Printing', slug: 'printing', icon: 'fa-print' },
+        { id: 'cat2', name: '👕 T-Shirt', slug: 't-shirt', icon: 'fa-tshirt' },
+        { id: 'cat3', name: '🚩 Flags', slug: 'flags', icon: 'fa-flag' },
+        { id: 'cat4', name: '💒 Wedding Cards', slug: 'wedding-cards', icon: 'fa-heart' },
+        { id: 'cat5', name: '🔑 Keyrings', slug: 'keyrings', icon: 'fa-key' },
+        { id: 'cat6', name: '🎒 School Vest', slug: 'school-vest', icon: 'fa-graduation-cap' },
+        { id: 'cat7', name: '📸 Flex Photos', slug: 'flex-photos', icon: 'fa-camera' },
+        { id: 'cat8', name: '🖥️ Digital Boards', slug: 'digital-boards', icon: 'fa-tv' },
+        { id: 'cat9', name: '💡 Neon Boards', slug: 'neon-boards', icon: 'fa-lightbulb' }
     ], null, 2));
 }
 
@@ -57,7 +72,61 @@ function getUsers() {
     }
 }
 
-// API Routes
+function saveUsers(users) {
+    fs.writeFileSync(USERS_FILE, JSON.stringify(users, null, 2));
+}
+
+function getCategories() {
+    try {
+        const data = fs.readFileSync(CATEGORIES_FILE, 'utf8');
+        return JSON.parse(data);
+    } catch (error) {
+        return [];
+    }
+}
+
+function saveCategories(categories) {
+    fs.writeFileSync(CATEGORIES_FILE, JSON.stringify(categories, null, 2));
+}
+
+// ============== CATEGORY ROUTES ==============
+app.get('/api/categories', (req, res) => {
+    res.json(getCategories());
+});
+
+app.post('/api/categories', (req, res) => {
+    const categories = getCategories();
+    const newCategory = {
+        id: 'cat' + Date.now(),
+        name: req.body.name,
+        slug: req.body.name.toLowerCase().replace(/[^a-z0-9]/g, '-'),
+        icon: req.body.icon || 'fa-tag'
+    };
+    categories.push(newCategory);
+    saveCategories(categories);
+    res.status(201).json(newCategory);
+});
+
+app.put('/api/categories/:id', (req, res) => {
+    let categories = getCategories();
+    const index = categories.findIndex(c => c.id === req.params.id);
+    if (index !== -1) {
+        categories[index] = { ...categories[index], ...req.body };
+        saveCategories(categories);
+        res.json(categories[index]);
+    } else {
+        res.status(404).json({ error: 'Category not found' });
+    }
+});
+
+app.delete('/api/categories/:id', (req, res) => {
+    let categories = getCategories();
+    categories = categories.filter(c => c.id !== req.params.id);
+    saveCategories(categories);
+    res.json({ message: 'Category deleted' });
+});
+
+// ============== SERVICE ROUTES ==============
 app.get('/api/services', (req, res) => {
     try {
         const services = getServices();
@@ -69,9 +138,7 @@ app.get('/api/services', (req, res) => {
 
 app.post('/api/services', (req, res) => {
     try {
-        console.log('📦 Received service data');
         const services = getServices();
-        
         const newService = {
             _id: Date.now().toString(),
             name: req.body.name || 'Untitled',
@@ -84,14 +151,11 @@ app.post('/api/services', (req, res) => {
             createdAt: new Date().toISOString(),
             views: 0
         };
-        
         services.push(newService);
         saveServices(services);
-        console.log(`✅ Service added: ${newService.name}`);
         res.status(201).json(newService);
     } catch (error) {
-        console.error('Error adding service:', error);
-        res.status(500).json({ error: 'Failed to add service: ' + error.message });
+        res.status(500).json({ error: 'Failed to add service' });
     }
 });
 
@@ -106,6 +170,7 @@ app.delete('/api/services/:id', (req, res) => {
     }
 });
 
+// ============== AUTH ROUTES ==============
 app.post('/api/admin/login', (req, res) => {
     try {
         const { email, password } = req.body;
@@ -116,7 +181,7 @@ app.post('/api/admin/login', (req, res) => {
             res.json({ 
                 success: true, 
                 token: 'simple-token',
-                user: { username: user.username, email: user.email }
+                user: { id: user.id, username: user.username, email: user.email, role: user.role }
             });
         } else {
             res.status(401).json({ error: 'Invalid credentials' });
@@ -126,6 +191,25 @@ app.post('/api/admin/login', (req, res) => {
     }
 });
 
+app.post('/api/admin/change-password', (req, res) => {
+    try {
+        const { email, currentPassword, newPassword } = req.body;
+        let users = getUsers();
+        const userIndex = users.findIndex(u => u.email === email && u.password === currentPassword);
+        
+        if (userIndex !== -1) {
+            users[userIndex].password = newPassword;
+            saveUsers(users);
+            res.json({ success: true, message: 'Password changed successfully' });
+        } else {
+            res.status(401).json({ error: 'Current password is incorrect' });
+        }
+    } catch (error) {
+        res.status(500).json({ error: 'Failed to change password' });
+    }
+});
+
+// ============== STATS ROUTES ==============
 app.get('/api/admin/stats', (req, res) => {
     try {
         const services = getServices();
@@ -170,5 +254,4 @@ app.listen(PORT, '0.0.0.0', () => {
     console.log(`✅ SERVER RUNNING on port ${PORT}`);
     console.log(`📋 ADMIN PANEL: https://graphichousefinal.onrender.com`);
     console.log(`🔐 LOGIN: admin@graphichouse.com.np / admin123`);
-    console.log(`📸 Image upload: Enabled (50MB limit)`);
 });
