@@ -1,0 +1,9 @@
+[
+  {
+    "id": "1",
+    "username": "admin",
+    "email": "admin@graphichouse.com.np",
+    "password": "admin123",
+    "role": "admin"
+  }
+]
